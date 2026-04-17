@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- 다크 모드에서도 NoActionBar 테마를 사용하여 커스텀 툴바 충돌을 방지합니다. -->
+    <style name="Base.Theme.Project" parent="Theme.AppCompat.NoActionBar">
+        <!-- 메인 빨간색 포인트 -->
+        <item name="colorPrimary">@color/youtube_red</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorAccent">@color/youtube_accent</item>
+
+        <!-- 전체 배경을 블랙으로 설정 -->
+        <item name="android:windowBackground">#121212</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:editTextColor">#FFFFFF</item>
+    </style>
+
+    <style name="Theme.Project" parent="Base.Theme.Project" />
+</resources>
