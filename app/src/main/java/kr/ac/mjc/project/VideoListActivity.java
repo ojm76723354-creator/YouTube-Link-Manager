@@ -3,10 +3,15 @@ package kr.ac.mjc.project;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,6 +87,80 @@ public class VideoListActivity extends AppCompatActivity {
             intent.putExtra("category", video.getCategory());
             startActivity(intent);
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_video_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_edit_category) {
+            showEditCategoryDialog();
+            return true;
+        } else if (item.getItemId() == R.id.action_delete_category) {
+            showDeleteCategoryDialog();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showEditCategoryDialog() {
+        EditText etNewName = new EditText(this);
+        etNewName.setText(categoryName);
+        etNewName.setSelection(categoryName.length());
+
+        new AlertDialog.Builder(this)
+                .setTitle("카테고리 이름 변경")
+                .setView(etNewName)
+                .setPositiveButton("변경", (dialog, which) -> {
+                    String newName = etNewName.getText().toString().trim();
+                    if (!newName.isEmpty() && !newName.equals(categoryName)) {
+                        new Thread(() -> {
+                            db.categoryDao().updateCategoryName(categoryName, newName);
+                            db.videoDao().updateCategoryNameForVideos(categoryName, newName);
+                            categoryName = newName;
+                            runOnUiThread(() -> {
+                                if (getSupportActionBar() != null) {
+                                    getSupportActionBar().setTitle(categoryName);
+                                }
+                                loadVideos();
+                                Toast.makeText(this, "이름이 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                            });
+                        }).start();
+                    }
+                })
+                .setNegativeButton("취소", null)
+                .show();
+    }
+
+    private void showDeleteCategoryDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("카테고리 삭제")
+                .setMessage("'" + categoryName + "' 카테고리를 삭제하시겠습니까?\n이 카테고리의 영상은 삭제되지 않습니다.")
+                .setPositiveButton("삭제", (dialog, which) -> {
+                    new Thread(() -> {
+                        Category category = null;
+                        List<Category> categories = db.categoryDao().getAllCategories();
+                        for (Category c : categories) {
+                            if (c.getName().equals(categoryName)) {
+                                category = c;
+                                break;
+                            }
+                        }
+                        if (category != null) {
+                            db.categoryDao().delete(category);
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "카테고리가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                finish();
+                            });
+                        }
+                    }).start();
+                })
+                .setNegativeButton("취소", null)
+                .show();
     }
 
     @Override

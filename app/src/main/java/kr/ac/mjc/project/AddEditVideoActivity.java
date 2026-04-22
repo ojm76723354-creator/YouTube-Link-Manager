@@ -83,11 +83,17 @@ public class AddEditVideoActivity extends AppCompatActivity {
     private void loadCategories() {
         categoryList = db.categoryDao().getAllCategories();
         
-        if (categoryList.isEmpty()) {
+        // MainActivity와 동일하게 SharedPreferences로 최초 실행 체크
+        android.content.SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
+        boolean isFirstRun = prefs.getBoolean("is_first_run", true);
+
+        if (isFirstRun && categoryList.isEmpty()) {
             db.categoryDao().insert(new Category("공부"));
             db.categoryDao().insert(new Category("자기계발"));
             db.categoryDao().insert(new Category("개발"));
             db.categoryDao().insert(new Category("취미"));
+            
+            prefs.edit().putBoolean("is_first_run", false).apply();
             categoryList = db.categoryDao().getAllCategories();
         }
 

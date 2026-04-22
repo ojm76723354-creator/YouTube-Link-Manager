@@ -9,6 +9,7 @@ public class Category {
     private int id;
     
     private String name;
+    private int orderIndex;
 
     public Category(String name) {
         this.name = name;
@@ -18,6 +19,8 @@ public class Category {
     public void setId(int id) { this.id = id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public int getOrderIndex() { return orderIndex; }
+    public void setOrderIndex(int orderIndex) { this.orderIndex = orderIndex; }
     
     @Override
     public String toString() {

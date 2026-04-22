@@ -24,4 +24,7 @@ public interface VideoDao {
     
     @Query("SELECT * FROM videos WHERE category = :category ORDER BY id DESC")
     List<VideoItem> getVideosByCategory(String category);
+
+    @Query("UPDATE videos SET category = :newCategory WHERE category = :oldCategory")
+    void updateCategoryNameForVideos(String oldCategory, String newCategory);
 }
